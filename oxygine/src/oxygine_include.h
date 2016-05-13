@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string>
+#include <typeinfo>
 
 // Round everything to whole pixels during rendering.
 // Helps to avoid artifacts in pixel art games
@@ -70,7 +72,7 @@
 namespace oxygine { namespace log { void error(const char* format, ...); } }
 
 #define OX_LOG_ERROR(x)     if (!(x)) {oxygine::log::error("Assert! %s in %s:%d", #x, __FILE__, __LINE__);}
-
+#define OX_LOG_ERROR_PAR(x, y)     if (!(x)) {oxygine::log::error("Assert! %s in %s:%d %s", #x, __FILE__, __LINE__, y);}
 
 //assert without log::error
 #ifdef OXYGINE_QT
@@ -84,8 +86,12 @@ namespace oxygine { namespace log { void error(const char* format, ...); } }
 
 #if OXYGINE_ASSERT2LOG
 #   define OX_ASSERT(x) {OX_LOG_ERROR(x); OX_ASSERT_NL(x);}
+#   define OX_ASSERT_PAR(x, y) {OX_LOG_ERROR_PAR(x, y); OX_ASSERT_NL(x);}
+#   define OX_ASSERT_T(x) OX_ASSERT_PAR(x, (std::string("Type T:") + typeid(T).name()).c_str())
 #else
 #   define OX_ASSERT(x) {OX_ASSERT_NL(x);}
+#   define OX_ASSERT_PAR(x, y) OX_ASSERT(x)
+#   define OX_ASSERT_T(x) OX_ASSERT(x)
 #endif
 
 #define OXYGINE_HAS_RESTORE
